@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DevSecOps Hotstar Clone Project
 
 Plugins Required:
@@ -13,3 +14,6 @@ Plugins Required:
 •	Kubernetes All
 •	AWS
 
+=======
+# newreact
+>>>>>>> af90e7fd2886ab2b5d109239812b48cb31ae78dc
