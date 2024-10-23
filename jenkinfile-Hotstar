@@ -1,36 +1,17 @@
-pipeline{
+pipeline {
     agent any
-    tools{
-        jdk 'jdk17'
-        nodejs 'node16'
+    tools {
+         jdk 'jdk17'
+        nodejs "node16"
     }
     environment {
-        SCANNER_HOME=tool 'sonar-scanner'
+        SCANNER_HOME = tool 'sonar-scanner'
     }
+    
     stages {
-        stage('clean workspace'){
-            steps{
-                cleanWs()
-            }
-        }
-        stage('Checkout from Git'){
-            steps{
-                git branch: 'main', url: 'https://github.com/akaspatranobis/hotstar-clone-app-ci-cd-k8.git'
-            }
-        }
-        stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Hotstar \
-                    -Dsonar.projectKey=Hotstar'''
-                }
-            }
-        }
-        stage("quality gate"){
-           steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
-                }
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/justicejr07/newreact.git'
             }
         }
         stage('Install Dependencies') {
@@ -38,58 +19,65 @@ pipeline{
                 sh "npm install"
             }
         }
-        stage('OWASP FS SCAN') {
+        stage('Unit Test Cases') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', nvdCredentialsId: 'NVDkey', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                sh "npm test"
             }
         }
-        stage('Docker Scout FS') {
+       
+                stage('SonarQube Analsyis') {
             steps {
-                script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-// scans all files and folders in your current working directory for potential security weaknesses/vulnerabilities
-                       sh 'docker-scout quickview fs://.'   
-// identify vulnerabilities (CVEs - Common Vulnerabilities and Exposures) based on levels of the vulnerabilities (critical, high, medium, etc.)
-                       sh 'docker-scout cves fs://.'
-                   }
+                withSonarQubeEnv('sonar') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=campapp -Dsonar.projectKey=campapp \
+                            -Dsonar.java.binaries=. '''
                 }
             }
         }
-        stage("Docker Build & Push"){
-            steps{
-                script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh "docker build -t hotstar ."
-                       sh "docker tag hotstar apatranobis59/hotstar:latest "
-                       sh "docker push apatranobis59/hotstar:latest"
+          # due to bug not add qg
+
+        stage('Build & Tag Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh '''
+                        docker build -t justicejr/campgroundapp:latest .
+                        '''
                     }
                 }
             }
         }
-        stage('Docker Scout Image') {
+      
+        stage('Push Docker Image') {
             steps {
-                script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh 'docker-scout quickview apatranobis59/hotstar:latest'
-                       sh 'docker-scout cves apatranobis59/hotstar:latest'
-                       sh 'docker-scout recommendations apatranobis59/hotstar:latest'
-                   }
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh '''
+                        docker push justicejr/campgroundapp:latest
+                        '''
+                    }
                 }
             }
         }
-        
-        stage('Deploy to kubernets'){
-            steps{
-                script{
-                    dir('K8S') {
-                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                                sh 'kubectl apply -f deployment.yml'
-                                sh 'kubectl apply -f service.yml'
-                        }
-                    }
+        stage('Run Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    docker run -d -p 3000:3000 justicejr/campgroundapp:latest
+                    '''
                 }
             }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
