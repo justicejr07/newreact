@@ -21,14 +21,7 @@ pipeline {
         }
         
        
-                stage('SonarQube Analsyis') {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hotstar -Dsonar.projectKey=hotstar \
-                            -Dsonar.java.binaries=. '''
-                }
-            }
-        }
+          
           
 
         stage('Build & Tag Docker Image') {
