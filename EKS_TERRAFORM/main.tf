@@ -73,8 +73,7 @@ resource "aws_instance" "web_instance" {
   key_name              = "DevOps" # Replace with your own key pair
 
   # Use vpc_security_group_ids instead of security_groups
-  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
-
+  vpc_security_group_ids = sg-04d994a48377e3570
   user_data = <<-EOF
     #!/bin/bash
     apt update -y
