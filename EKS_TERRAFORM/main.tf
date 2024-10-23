@@ -70,7 +70,7 @@ resource "aws_instance" "web_instance" {
   ami                    = "ami-0866a3c8686eaeeba" # Ubuntu AMI
   instance_type         = "t2.micro"
   subnet_id             = aws_subnet.public_subnet.id
-  key_name              = "your-key-pair" # Replace with your own key pair
+  key_name              = "DevOps" # Replace with your own key pair
 
   # Use vpc_security_group_ids instead of security_groups
   vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
