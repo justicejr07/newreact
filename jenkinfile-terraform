@@ -1,49 +1,25 @@
 pipeline {
     agent any
 
+    environment {
+        Action = 'apply' // Default action. Can be 'apply' or 'destroy'.
+    }
+
     stages {
         stage('Git Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/akaspatranobis/hotstar-clone-app-ci-cd-k8.git'
+                git branch: 'main', url: 'https://github.com/justicejr07/newreact.git'
             }
         }
-        
+
         stage('Terraform Version Check') {
             steps {
                 sh 'terraform --version'
             }
         }
-        
+
         stage('Terraform Initialize') {
             steps {
                 dir('EKS_TERRAFORM') {
                     sh 'terraform init'
-                }
-            }
-        }
-        
-        stage('Terraform Validate') {
-            steps {
-                dir('EKS_TERRAFORM') {
-                    sh 'terraform validate'
-                }
-            }
-        }
-        
-        stage('Terraform Plan') {
-            steps {
-                dir('EKS_TERRAFORM') {
-                    sh 'terraform plan'
-                }
-            }
-        }
-        
-        stage('Terraform Apply/Destroy') {
-            steps {
-                dir('EKS_TERRAFORM') {
-                    sh 'terraform ${Action} --auto-approve'
-                }
-            }
-        }
-    }
-}
+               
