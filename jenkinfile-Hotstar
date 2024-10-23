@@ -33,7 +33,7 @@ pipeline {
                 }
             }
         }
-          # due to bug not add qg
+          
 
         stage('Build & Tag Docker Image') {
             steps {
