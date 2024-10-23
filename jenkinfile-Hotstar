@@ -24,7 +24,7 @@ pipeline {
                 stage('SonarQube Analsyis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=campapp -Dsonar.projectKey=campapp \
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hotstar -Dsonar.projectKey=hotstar \
                             -Dsonar.java.binaries=. '''
                 }
             }
