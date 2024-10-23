@@ -3,7 +3,7 @@ resource "aws_vpc" "main_vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
     Name = "main-vpc"
-  } 
+  }
 }
 
 # Create an Internet Gateway for the VPC
@@ -14,17 +14,26 @@ resource "aws_internet_gateway" "main_igw" {
   }
 }
 
-# Create a public subnet
-resource "aws_subnet" "public_subnet" {
+# Create public subnets in different availability zones
+resource "aws_subnet" "public_subnet_1" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
   tags = {
-    Name = "public-subnet"
+    Name = "public-subnet-1"
   }
 }
 
-# Create a route table for the public subnet
+resource "aws_subnet" "public_subnet_2" {
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+  tags = {
+    Name = "public-subnet-2"
+  }
+}
+
+# Create a route table for the public subnets
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.main_vpc.id
   route {
@@ -33,9 +42,14 @@ resource "aws_route_table" "public_route_table" {
   }
 }
 
-# Associate the route table with the public subnet
-resource "aws_route_table_association" "public_association" {
-  subnet_id      = aws_subnet.public_subnet.id
+# Associate the route table with the public subnets
+resource "aws_route_table_association" "public_association_1" {
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+resource "aws_route_table_association" "public_association_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
   route_table_id = aws_route_table.public_route_table.id
 }
 
@@ -73,7 +87,7 @@ resource "aws_security_group" "allow_http_ssh" {
 resource "aws_instance" "web_instance" {
   ami                    = "ami-0866a3c8686eaeeba" # Ubuntu AMI
   instance_type         = "t2.micro"
-  subnet_id             = aws_subnet.public_subnet.id
+  subnet_id             = aws_subnet.public_subnet_1.id
   key_name              = "DevOps" # Replace with your own key pair
 
   vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
@@ -124,7 +138,10 @@ resource "aws_eks_cluster" "example" {
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = [aws_subnet.public_subnet.id]
+    subnet_ids = [
+      aws_subnet.public_subnet_1.id,
+      aws_subnet.public_subnet_2.id,
+    ]
   }
 
   depends_on = [
@@ -168,7 +185,10 @@ resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.example.name
   node_group_name = "Node-cloud"
   node_role_arn   = aws_iam_role.eks_node_group_role.arn
-  subnet_ids      = [aws_subnet.public_subnet.id]
+  subnet_ids      = [
+    aws_subnet.public_subnet_1.id,
+    aws_subnet.public_subnet_2.id,
+  ]
 
   scaling_config {
     desired_size = 1
