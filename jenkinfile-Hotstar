@@ -36,7 +36,7 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         sh '''
-                        docker build -t justicejr/campgroundapp:latest .
+                        docker build -t justice/hotstart:latest .
                         '''
                     }
                 }
@@ -48,21 +48,25 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         sh '''
-                        docker push justicejr/campgroundapp:latest
+                        docker push justice/hotstart:latest
                         '''
                     }
                 }
             }
         }
-        stage('Run Docker Image') {
-            steps {
-                script {
-                    sh '''
-                    docker run -d -p 3000:3000 justicejr/campgroundapp:latest
-                    '''
+           stage('Deploy to kubernets'){
+            steps{
+                script{
+                    dir('K8S') {
+                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-cred', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                                sh 'kubectl apply -f deployment.yml'
+                                sh 'kubectl apply -f service.yml'
+                        }
+                    }
                 }
             }
         }
+      
     }
 }
 
