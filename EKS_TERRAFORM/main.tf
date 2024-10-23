@@ -42,24 +42,28 @@ resource "aws_route_table_association" "public_association" {
 # Create a security group allowing HTTP and SSH traffic
 resource "aws_security_group" "allow_http_ssh" {
   vpc_id = aws_vpc.main_vpc.id
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere
   }
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Allow HTTP access
   }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
   }
+
   tags = {
     Name = "allow_http_ssh"
   }
@@ -72,8 +76,9 @@ resource "aws_instance" "web_instance" {
   subnet_id             = aws_subnet.public_subnet.id
   key_name              = "DevOps" # Replace with your own key pair
 
-  # Use vpc_security_group_ids instead of security_groups
-  vpc_security_group_ids = sg-04d994a48377e3570
+  # Correctly reference the security group using its resource name
+  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
+
   user_data = <<-EOF
     #!/bin/bash
     apt update -y
