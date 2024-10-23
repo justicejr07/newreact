@@ -29,7 +29,7 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         sh '''
-                        docker build -t justicejr/hotstart:latest .
+                        docker build -t justice/hotstart:latest .
                         '''
                     }
                 }
@@ -41,7 +41,7 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         sh '''
-                        docker push justicejr/hotstart:latest
+                        docker push justice/hotstart:latest
                         '''
                     }
                 }
