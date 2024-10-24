@@ -49,6 +49,8 @@ pipeline {
                             restrictKubeConfigAccess: false, 
                             serverUrl: 'https://0F36E8B0D17ADCF87B35F967025782B6.gr7.us-east-1.eks.amazonaws.com'
                         ) {
+                               sh 'kubectl apply -f deployment.yml --dry-run=client'
+      
                             sh 'kubectl apply -f deployment.yml'
                             sh 'kubectl apply -f service.yml'
                         }
