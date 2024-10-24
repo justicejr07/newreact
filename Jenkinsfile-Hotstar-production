@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/justicejr07/newreact.git'
+                git branch: 'main', credentialsId: 'git-cred', url:'https://github.com/justicejr07/newreact.git'
             }
         }
         stage('Install Dependencies') {
