@@ -5,7 +5,7 @@ Plugins Required:
 •	Eclipse Temurin installer
 •	Sonarqube Scanner
 •	NodeJs
-•	OWASP Dependency-Check
+•	trivy
 •	Docker
 •	Docker Commons
 •	Docker Pipeline
