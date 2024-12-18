@@ -34,7 +34,7 @@ function App() {
     <div className='lg'>
     <img src="https://img10.hotstar.com/image/upload/f_auto,h_148/sources/r1/cms/prod/2744/1602744-t-f24fc98823fa" alt="" />
             <h3>2023 . 2h 54m . 4 languages . <span>U/A 16+</span> </h3>
-            <p>In a crime-infested town, justice bhai and his gang are the reigning powers. To combat this reign and seek revenge, Inspector </p>
+            <p>In a crime-infested town, justice & kannan bhai and his gang are the reigning powers. To combat this reign and seek revenge, Inspector </p>
             <h3>Action | Drama | Thriller | Drugs</h3>
             <button className='btn'>Subscribe to Watch</button>
             <button className='bb btn'>+</button>
